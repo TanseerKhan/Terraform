@@ -1,3 +1,5 @@
+# This file configures the AWS provider for Terraform.
+
 terraform {
   required_providers {
     aws = {
@@ -6,5 +8,3 @@ terraform {
     }
   }
 }
-
-# This file configures the AWS provider for Terraform.
