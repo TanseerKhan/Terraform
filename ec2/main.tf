@@ -1,12 +1,10 @@
 # Key-pair for EC2 instances
-
 resource aws_key_pair "ec2_key_pair" {
     key_name = "ssh-keypair"
     public_key = file("./ssh-keypair.pub")
 }
 
 # VPC & Security Group 
-
 resource aws_default_vpc default_vpc {
 
 }
