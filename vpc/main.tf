@@ -8,7 +8,7 @@ resource "aws_vpc" "prod-vpc" {
     }
 }
 
-# AWS Subnet
+# Public Subnets
 resource "aws_subnet" "public_subnet" {
     count = length(var.public_subnet_cidrs)
     vpc_id = aws_vpc.prod-vpc.id
@@ -21,7 +21,7 @@ resource "aws_subnet" "public_subnet" {
   
 }
 
-# AWS Subnet
+# Private Subnets
 resource "aws_subnet" "private_subnet" {
     count = length(var.private_subnet_cidrs)
     vpc_id = aws_vpc.prod-vpc.id
