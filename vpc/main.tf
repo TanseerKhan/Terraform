@@ -7,3 +7,5 @@ resource "aws_vpc" "prod-vpc" {
       Environment = "Production"
     }
 }
+
+# AWS Subnet
