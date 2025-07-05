@@ -4,7 +4,7 @@ resource "aws_vpc" "prod-vpc" {
     instance_tenancy = "default"
     tags = {
       Name = "prod-vpc"
-      Environment = "Production"
+      Environment = "production"
     }
 }
 
@@ -16,7 +16,7 @@ resource "aws_subnet" "public_subnet" {
     availability_zone = element(var.availability_zones, count.index)
     tags = {
       Name = "public-subnet-${count.index + 1}"
-      Environment = "Production"
+      Environment = "production"
     }
   
 }
@@ -29,6 +29,15 @@ resource "aws_subnet" "private_subnet" {
     availability_zone = element(var.availability_zones, count.index)
     tags = {
       Name = "private-subnet-${count.index + 1}"
-      Environment = "Production"
+      Environment = "production"
     }
+}
+
+# Internet Gateway
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.prod-vpc.id
+  tags = {
+    Name = "prod-igw"
+    Environment = "production"
+  }
 }
