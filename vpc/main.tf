@@ -47,3 +47,14 @@ resource "aws_eip" "nat-eip" {
   count = length(var.private_subnet_cidrs)
 }
 
+# NAT Gateway
+resource "aws_nat_gateway" "prodngw" {
+    count = length(var.private_subnet_cidrs)
+    depends_on = [ aws_eip.nat-eip ] # Ensure EIP is created before NAT Gateway
+    allocation_id = aws_eip.nat-eip[count.index].id
+    subnet_id = aws_subnet.private_subnet[count.index].id
+    tags = {
+      Name = "prod-ngw-${count.index + 1}"
+      Environment = "production"
+    }
+}
