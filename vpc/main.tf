@@ -41,3 +41,9 @@ resource "aws_internet_gateway" "igw" {
     Environment = "production"
   }
 }
+
+# Elastic IP for NAT Gateway
+resource "aws_eip" "nat-eip" {
+  count = length(var.private_subnet_cidrs)
+}
+
