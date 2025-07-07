@@ -8,6 +8,15 @@ resource "aws_vpc" "prod-vpc" {
     }
 }
 
+# Security Group for VPC
+resource "aws_security_group" "vpc_sg" {
+  vpc_id = aws_vpc.prod-vpc.id
+  tags = {
+    Name = "vpc-sg"
+    Environment = "production"
+  }
+}
+
 # Public Subnets
 resource "aws_subnet" "public_subnet" {
     count = length(var.public_subnet_cidrs)
@@ -42,6 +51,15 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
+# Security Group for Internet Gateway
+resource "aws_security_group" "igw_sg" {      
+  vpc_id = aws_vpc.prod-vpc.id
+  tags = {
+    Name = "igw-sg"
+    Environment = "production"
+  }
+}
+
 # Elastic IP for NAT Gateway
 resource "aws_eip" "nat-eip" {
   count = length(var.private_subnet_cidrs)
@@ -57,6 +75,15 @@ resource "aws_nat_gateway" "ngw" {
       Name = "ngw-${count.index + 1}"
       Environment = "production"
     }
+}
+
+# Security Group for NAT Gateway
+resource "aws_security_group" "nat_sg" {
+  vpc_id = aws_vpc.prod-vpc.id
+  tags = {
+    Name = "nat-sg"
+    Environment = "production"
+  }
 }
 
 # Route Table for Public Subnets
@@ -80,6 +107,15 @@ resource "aws_route_table_association" "public-rt-assoc" {
   route_table_id = aws_route_table.public-rt.id
 }
 
+# Security Group for Public Subnets
+resource "aws_security_group" "public_sg" {
+  vpc_id = aws_vpc.prod-vpc.id
+  tags = {
+    Name = "public-sg"
+    Environment = "production"
+  }
+}
+
 # Route Table for Private Subnets
 resource "aws_route_table" "private-rt" {
   count = length(var.private_subnet_cidrs)
@@ -91,6 +127,15 @@ resource "aws_route_table" "private-rt" {
   }
   tags = {
     Name = "private-rt-${count.index + 1}"
+    Environment = "production"
+  }
+}
+
+# Security Group for Private Subnets
+resource "aws_security_group" "private_sg" {
+  vpc_id = aws_vpc.prod-vpc.id
+  tags = {
+    Name = "private-sg"
     Environment = "production"
   }
 }
