@@ -58,3 +58,37 @@ resource "aws_nat_gateway" "prodngw" {
       Environment = "production"
     }
 }
+
+# Route Table for Public Subnets
+resource "aws_route_table" "public-rt" {
+  vpc_id = aws_vpc.prod-vpc.id
+  depends_on = [ aws_internet_gateway.igw ]
+  route{
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+  tags = {
+    Name = "public-rt"
+    Environment = "production"
+  }
+}
+
+# Route Table Association for Public Subnets
+
+
+# Route Table for Private Subnets
+resource "aws_route_table" "private-rt" {
+  count = length(var.private_subnet_cidrs)
+  vpc_id = aws_vpc.prod-vpc.id
+  depends_on = [ aws_nat_gateway.prodngw ]
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.prodngw[count.index].id
+  }
+  tags = {
+    Name = "private-rt-${count.index + 1}"
+    Environment = "production"
+  }
+}
+
+# Route Table Association for Private Subnets
