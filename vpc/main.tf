@@ -48,13 +48,13 @@ resource "aws_eip" "nat-eip" {
 }
 
 # NAT Gateway
-resource "aws_nat_gateway" "prodngw" {
+resource "aws_nat_gateway" "ngw" {
     count = length(var.private_subnet_cidrs)
     depends_on = [ aws_eip.nat-eip ] # Ensure EIP is created before NAT Gateway
     allocation_id = aws_eip.nat-eip[count.index].id
     subnet_id = aws_subnet.private_subnet[count.index].id
     tags = {
-      Name = "prod-ngw-${count.index + 1}"
+      Name = "ngw-${count.index + 1}"
       Environment = "production"
     }
 }
@@ -74,16 +74,20 @@ resource "aws_route_table" "public-rt" {
 }
 
 # Route Table Association for Public Subnets
-
+resource "aws_route_table_association" "public-rt-assoc" {
+  count = length(var.public_subnet_cidrs)
+  subnet_id = aws_subnet.public_subnet[count.index].id
+  route_table_id = aws_route_table.public-rt.id
+}
 
 # Route Table for Private Subnets
 resource "aws_route_table" "private-rt" {
   count = length(var.private_subnet_cidrs)
   vpc_id = aws_vpc.prod-vpc.id
-  depends_on = [ aws_nat_gateway.prodngw ]
+  depends_on = [ aws_nat_gateway.ngw ]
   route {
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.prodngw[count.index].id
+    nat_gateway_id = aws_nat_gateway.ngw[count.index].id
   }
   tags = {
     Name = "private-rt-${count.index + 1}"
@@ -92,3 +96,8 @@ resource "aws_route_table" "private-rt" {
 }
 
 # Route Table Association for Private Subnets
+resource "aws_route_table_association" "private-rt-assoc" {
+  count = length(var.private_subnet_cidrs)
+  subnet_id = aws_subnet.private_subnet[count.index].id
+  route_table_id = aws_route_table.private-rt[count.index].id
+}
